@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(
     app,
     resources={r"/*": {"origins": [
-"http://localhost:3000", "https://eden-tir.vercel.app"
+ "https://eden-tir.vercel.app"
     ]}},
     supports_credentials=True
 )
