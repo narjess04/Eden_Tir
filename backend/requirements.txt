@@ -1,0 +1,10 @@
+flask
+flask-cors
+supabase
+reportlab
+pypdf
+num2words
+qrcode
+python-dotenv
+gunicorn
+reportlab
