@@ -10,9 +10,11 @@ import os
 app = Flask(__name__)
 CORS(
     app,
-    resources={r"/*": {"origins": [
- "https://eden-tir.vercel.app"
-    ]}},
+    resources={r"/*": {origins=[
+    "https://eden-tir.vercel.app",
+    "https://eden-tir.vercel.app/",
+    "eden-tir.vercel.app"
+]}},
     supports_credentials=True
 )
 
