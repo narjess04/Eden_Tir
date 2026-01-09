@@ -221,7 +221,6 @@ export default function FactureDetails() {
             setDossier(prev => ({ ...prev, dbFactureId: factureResult.data.id }));
             alert("✅ Facture enregistrée avec succès !");
             fetchDossier();
-            navigate("/archive");
 
         } catch (error) {
             console.error(error);
