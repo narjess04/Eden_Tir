@@ -152,7 +152,11 @@ export default function FactureDetails() {
                     date_arrivee: dossier.date_dest,
                     conteneur: dossier.ctu_lta?.split('"')[0] || "",
                     marque: dossier.ctu_lta?.includes('"') ? dossier.ctu_lta.split('"').slice(1).join('"') : "",
-                    declaration_c: dossier.declaration_no ? `${dossier.declaration_no}` : "",
+                    declaration_c: dossier.declaration_no && dossier.date_declaration
+                        ? `${dossier.declaration_no} du ${new Date(
+                            dossier.date_declaration
+                        ).toLocaleDateString("fr-FR")}`
+                        : "",
                     declaration_uc: declarationUC,
                     escale: dossier.escale || "",
                     rubrique: dossier.rubrique || "",
@@ -376,7 +380,6 @@ export default function FactureDetails() {
                             Total en votre aimable règlement : {Math.floor(totalFinal)} Dinars, {Math.round((totalFinal % 1) * 1000)} millimes
                         </div>
 
-                        {/* VOS BOUTONS PERSONNALISÉS */}
                         <div className="flex gap-4 print:hidden">
                             <button
                                 type="button"

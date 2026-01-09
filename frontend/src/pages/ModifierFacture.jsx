@@ -80,52 +80,35 @@ export default function FactureModifier() {
     const totalFinal = debTotal + taxTotal + tva19 + tva7 + timbre;
 
     const handleDownloadPDF = async () => {
-        if (!formData.dossier_no) {
-            alert("Veuillez saisir un numéro de dossier.");
+        if (!dossier?.dbFactureId) {
+            alert("Facture non encore enregistrée");
             return;
         }
 
         const API_URL = import.meta.env.VITE_API_URL;
-
         try {
-            const response = await fetch(`${API_URL}/generate-pdf`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",   // important cross-origin
-                body: JSON.stringify(formData),
+            const response = await fetch(`${API_URL}/facture/${dossier.dbFactureId}`, {
+                method: "GET",
+                credentials: "include",
             });
 
-            if (!response.ok) {
-                throw new Error("Erreur serveur lors de la génération du PDF");
-            }
+            if (!response.ok) throw new Error("Erreur téléchargement");
 
             const blob = await response.blob();
-
-            // Forcer le type MIME
-            const pdfBlob = new Blob([blob], { type: "application/pdf" });
-
-            const url = window.URL.createObjectURL(pdfBlob);
-
-            // Sécuriser le nom du fichier
-            const safeDossierNo = String(formData.dossier_no).replace(/[\/\\]/g, "_");
-
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = `Dossier_${safeDossierNo}.pdf`;
-
-            document.body.appendChild(link);
-            link.click();
-
-            link.remove();
-            window.URL.revokeObjectURL(url);
-
+            const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `facture_${dossier_no}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
         } catch (error) {
-            console.error("Erreur lors du téléchargement :", error);
-            alert("Impossible de générer le PDF. Vérifiez le serveur.");
+            console.error(error);
+            alert("Impossible de télécharger la facture");
         }
     };
+
+
 
 
     const handleUpdate = async () => {
@@ -142,7 +125,11 @@ export default function FactureModifier() {
                     date_arrivee: dossier.date_dest,
                     conteneur: dossier.ctu_lta?.split('"')[0] || "",
                     marque: dossier.ctu_lta?.includes('"') ? dossier.ctu_lta.split('"').slice(1).join('"') : "",
-                    declaration_c: dossier.declaration_no ? `${dossier.declaration_no}` : "",
+                    declaration_c: dossier.declaration_no && dossier.date_declaration
+                        ? `${dossier.declaration_no} du ${new Date(
+                            dossier.date_declaration
+                        ).toLocaleDateString("fr-FR")}`
+                        : "",
                     declaration_uc: declarationUC,
                     escale: dossier.escale || "",
                     rubrique: dossier.rubrique || "",
@@ -255,7 +242,11 @@ export default function FactureModifier() {
                             </div>
 
                             <div className="space-y-1">
-                                <InfoRow label="Déclaration C n° :" value={dossier.declaration_no} />
+                                <InfoRow label="Déclaration C n° :" value={dossier.declaration_no && dossier.date_declaration
+                                    ? `${dossier.declaration_no} du ${new Date(
+                                        dossier.date_declaration
+                                    ).toLocaleDateString("fr-FR")}`
+                                    : ""} />
                                 <div className="flex items-center">
                                     <span className="w-36 font-bold">Déclaration UC :</span>
                                     <input
