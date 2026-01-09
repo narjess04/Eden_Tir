@@ -79,6 +79,55 @@ export default function FactureModifier() {
     const taxTotal = transitTotal + transportTotal;
     const totalFinal = debTotal + taxTotal + tva19 + tva7 + timbre;
 
+    const handleDownloadPDF = async () => {
+        if (!formData.dossier_no) {
+            alert("Veuillez saisir un numéro de dossier.");
+            return;
+        }
+
+        const API_URL = import.meta.env.VITE_API_URL;
+
+        try {
+            const response = await fetch(`${API_URL}/generate-pdf`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                credentials: "include",   // important cross-origin
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error("Erreur serveur lors de la génération du PDF");
+            }
+
+            const blob = await response.blob();
+
+            // Forcer le type MIME
+            const pdfBlob = new Blob([blob], { type: "application/pdf" });
+
+            const url = window.URL.createObjectURL(pdfBlob);
+
+            // Sécuriser le nom du fichier
+            const safeDossierNo = String(formData.dossier_no).replace(/[\/\\]/g, "_");
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `Dossier_${safeDossierNo}.pdf`;
+
+            document.body.appendChild(link);
+            link.click();
+
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error("Erreur lors du téléchargement :", error);
+            alert("Impossible de générer le PDF. Vérifiez le serveur.");
+        }
+    };
+
+
     const handleUpdate = async () => {
         try {
             setSaving(true);
@@ -262,6 +311,14 @@ export default function FactureModifier() {
                             >
                                 Annuler
                             </button>
+                            <button
+                                type="button"
+                                onClick={handleDownloadPDF}
+                                className="flex-1 bg-white text-black border-2 border-black py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-zinc-100 transition active:scale-95"
+                            >
+                                Télécharger PDF
+                            </button>
+
 
                             <button
                                 type="button"
