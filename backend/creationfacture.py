@@ -79,9 +79,12 @@ def generer_facture_eden_dynamique(fichier_entete, data):
 
         y_info = 218*mm 
         f = data['facture']
+        mode = f.get("mode")  
+        Date = "Date de sortie :" if mode == "export" else "Date d'arrivée :"
         
         c.setFont("Helvetica-Bold", 8.5)
-        labels_gauche = ["Facture n° :", "Date Facture :", "Dossier import n° :", "Navire :", "Date d'arrivée :", "Conteneur :" , "Marque"]
+
+        labels_gauche = ["Facture n° :", "Date Facture :", "Dossier import n° :", "Navire :", Date , "Conteneur :" , "Marque"]
         values_gauche = [f.get('numero'), f.get('date', '')[:10], f.get('dossier_no'), f.get('navire'), f.get('date_arrivee'), f.get('conteneur'), f.get('marque')]
         
         for i, (label, val) in enumerate(zip(labels_gauche, values_gauche)):
@@ -90,7 +93,11 @@ def generer_facture_eden_dynamique(fichier_entete, data):
             c.setFont("Helvetica", 8.5)
             c.drawString(60*mm, y_info - (i*4.5)*mm, str(val))
 
-        labels_droite = ["Déclaration C n° :", "Déclaration UC n° :", "Escale n° :", "Rubrique :", "Colisage :", "Poids Brut :", "Valeur Douane :"]
+        mode = f.get("mode")  
+        label_declaration = "Déclaration E n° :" if mode == "export" else "Déclaration C n° :"
+
+
+        labels_droite = [label_declaration, "Déclaration UC n° :", "Escale n° :", "Rubrique :", "Colisage :", "Poids Brut :", "Valeur Douane :"]
         values_droite = [f.get('declaration_c'), f.get('declaration_uc'), f.get('escale'), f.get('rubrique'), f.get('colisage'), f.get('poids_brut') , f.get('valeur_douane')]
 
         for i, (label, val) in enumerate(zip(labels_droite, values_droite)):

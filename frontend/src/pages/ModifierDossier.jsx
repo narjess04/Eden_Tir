@@ -4,7 +4,7 @@ import logo from "../logo.png";
 import { Link, useParams, useNavigate } from "react-router-dom";
 
 export default function ModifierDossier() {
-    const { dossier_no } = useParams(); // Récupère le numéro de dossier depuis l'URL
+    const { dossier_no } = useParams(); 
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);

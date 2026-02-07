@@ -114,21 +114,32 @@ export default function FactureModifier() {
     const handleUpdate = async () => {
         try {
             setSaving(true);
+            const nomClient =
+                dossier.mode === "import"
+                    ? dossier.destinataire
+                    : dossier.mode === "export"
+                        ? dossier.expediteur
+                        : "";
+
+            const date_arrive_sortie =
+                dossier.mode === "import"
+                    ? dossier.date_dest
+                    : dossier.mode === "export"
+                        ? dossier.date_emb
+                        : "";
 
             // Reconstruction du JSON selon le format du 2ème code
             const updatedDataJson = {
                 facture: {
                     numero: invoiceNumber,
-                    date: new Date().toISOString(),
+                    date: new Date().toLocaleDateString('fr-FR'),
                     dossier_no: dossier_no,
                     navire: dossier.navire || "",
-                    date_arrivee: dossier.date_dest,
+                    date_arrivee: date_arrive_sortie,
                     conteneur: dossier.ctu_lta?.split('"')[0] || "",
                     marque: dossier.ctu_lta?.includes('"') ? dossier.ctu_lta.split('"').slice(1).join('"') : "",
                     declaration_c: dossier.declaration_no && dossier.date_declaration
-                        ? `${dossier.declaration_no} du ${new Date(
-                            dossier.date_declaration
-                        ).toLocaleDateString("fr-FR")}`
+                        ? `${dossier.declaration_no} du ${dossier.date_declaration}`
                         : "",
                     declaration_uc: declarationUC,
                     escale: dossier.escale || "",
@@ -140,7 +151,7 @@ export default function FactureModifier() {
                 },
                 client: {
                     code_client: dossier.clientInfo?.code_client || "",
-                    nom: dossier.destinataire || "",
+                    nom: nomClient,
                     adresse: dossier.clientInfo?.adresse || "",
                     code_tva: dossier.clientInfo?.code_tva || ""
                 },
@@ -236,17 +247,23 @@ export default function FactureModifier() {
                                 <InfoRow label="Facture n° :" value={invoiceNumber} />
                                 <InfoRow label="Dossier import n° :" value={dossier.dossier_no} />
                                 <InfoRow label="Navire :" value={dossier.navire} />
-                                <InfoRow label="Date d'arrivée :" value={dossier.date_dest} />
+                                <InfoRow
+                                    label={dossier.mode === "export"
+                                        ? "Date de sortie :"
+                                        : "Date d'arrivée :"}
+                                    value={dossier.mode === "export"
+                                        ? dossier.date_emb
+                                        : dossier.date_dest}
+                                    isEditable={true}
+                                />
                                 <InfoRow label="Conteneur :" value={dossier.ctu_lta?.split('"')[0] + '"'} />
                                 <InfoRow label="Marque :" value={dossier.ctu_lta?.includes('"') ? dossier.ctu_lta.split('"').slice(1).join('"') : ""} />
                             </div>
 
                             <div className="space-y-1">
-                                <InfoRow label="Déclaration C n° :" value={dossier.declaration_no && dossier.date_declaration
-                                    ? `${dossier.declaration_no} du ${new Date(
-                                        dossier.date_declaration
-                                    ).toLocaleDateString("fr-FR")}`
-                                    : ""} />
+                                <InfoRow label={dossier.mode === "export" ? "Déclaration E n° :" : "Déclaration C n°"} value={dossier.declaration_no && dossier.date_declaration
+                                    ? `${dossier.declaration_no} du ${dossier.date_declaration}`
+                                    : ""} isEditable={true} />
                                 <div className="flex items-center">
                                     <span className="w-36 font-bold">Déclaration UC :</span>
                                     <input
