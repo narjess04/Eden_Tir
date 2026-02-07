@@ -46,15 +46,29 @@ export default function FactureModifier() {
             const factureExistante = data.factures[0];
             const json = factureExistante.data_json;
 
-            const { data: clientData } = await supabase
-                .from("clients")
-                .select("*")
-                .ilike("nom_client", data.destinataire.trim());
+            const nomClientRecherche =
+                data.mode === "import"
+                    ? data.destinataire
+                    : data.mode === "export"
+                        ? data.expediteur
+                        : null;
+
+            let clientData = [];
+
+            if (nomClientRecherche) {
+                const { data: clients } = await supabase
+                    .from("clients")
+                    .select("*")
+                    .ilike("nom_client", nomClientRecherche.trim());
+
+                clientData = clients || [];
+            }
 
             setDossier({
                 ...data,
+                clientNom: nomClientRecherche || "",
                 clientInfo: clientData?.[0] || {},
-                dbFactureId: factureExistante.id
+                dbFactureId: data.factures?.[0]?.id || null
             });
 
             if (json.lignes) setInvoiceRows(json.lignes);
@@ -114,6 +128,7 @@ export default function FactureModifier() {
     const handleUpdate = async () => {
         try {
             setSaving(true);
+
             const nomClient =
                 dossier.mode === "import"
                     ? dossier.destinataire
@@ -234,7 +249,11 @@ export default function FactureModifier() {
                             <img src={logo} alt="Logo" className="w-72" />
                             <div className="border border-zinc-300 p-4 w-[380px] leading-relaxed">
                                 <div className="text-[11px]">Code client : {dossier.clientInfo.code_client}</div>
-                                <div className="font-bold text-[15px] my-1 uppercase">Client : {dossier.destinataire}</div>
+                                <div className="font-bold text-[15px] my-1 uppercase">Client : {
+                                    dossier.mode === "export"
+                                        ? dossier.expediteur
+                                        : dossier.destinataire
+                                }</div>
                                 <div className="text-[11px]">Adresse : {dossier.clientInfo.adresse}</div>
                                 <div className="text-[11px]">Code TVA : {dossier.clientInfo.code_tva}</div>
                             </div>

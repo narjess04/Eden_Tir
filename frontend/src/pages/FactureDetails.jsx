@@ -165,7 +165,7 @@ export default function FactureDetails() {
                         ? dossier.expediteur
                         : "";
 
-            const date =
+            const date_arrive_sortie =
                 dossier.mode === "import"
                     ? dossier.date_dest
                     : dossier.mode === "export"
@@ -178,8 +178,9 @@ export default function FactureDetails() {
                     numero: nextInvoiceNumber,
                     date: new Date().toLocaleDateString('fr-FR'),
                     dossier_no: dossier_no,
+                    mode: dossier.mode,
                     navire: dossier.navire || "",
-                    date_arrivee: date,
+                    date_arrivee: date_arrive_sortie,
                     conteneur: dossier.ctu_lta?.split('"')[0] || "",
                     marque: dossier.ctu_lta?.includes('"') ? dossier.ctu_lta.split('"').slice(1).join('"') : "",
                     declaration_c:
@@ -302,7 +303,11 @@ export default function FactureDetails() {
                             <img src={logo} alt="Logo" className="w-72" />
                             <div className="border border-zinc-300 p-4 w-[380px] leading-relaxed">
                                 <div className="text-[11px]">Code client : {dossier.clientInfo.code_client}</div>
-                                <div className="font-bold text-[15px] my-1 uppercase">Client : {dossier.destinataire}</div>
+                                <div className="font-bold text-[15px] my-1 uppercase">Client : {
+                                    dossier.mode === "export"
+                                        ? dossier.expediteur
+                                        : dossier.destinataire
+                                }</div>
                                 <div className="text-[11px]">Adresse : {dossier.clientInfo.adresse}</div>
                                 <div className="text-[11px]">Code TVA : {dossier.clientInfo.code_tva}</div>
                             </div>
