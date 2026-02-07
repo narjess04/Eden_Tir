@@ -134,6 +134,7 @@ export default function FactureModifier() {
                     numero: invoiceNumber,
                     date: new Date().toLocaleDateString('fr-FR'),
                     dossier_no: dossier_no,
+                    mode: dossier.mode,
                     navire: dossier.navire || "",
                     date_arrivee: date_arrive_sortie,
                     conteneur: dossier.ctu_lta?.split('"')[0] || "",
