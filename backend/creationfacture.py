@@ -81,10 +81,11 @@ def generer_facture_eden_dynamique(fichier_entete, data):
         f = data['facture']
         mode = f.get("mode")  
         Date = "Date de sortie :" if mode == "export" else "Date d'arrivée :"
+        nom_facture = "Dossier export n°" if mode == "export" else "Dossier import n°"
         
         c.setFont("Helvetica-Bold", 8.5)
 
-        labels_gauche = ["Facture n° :", "Date Facture :", "Dossier import n° :", "Navire :", Date , "Conteneur :" , "Marque"]
+        labels_gauche = ["Facture n° :", "Date Facture :", nom_facture, "Navire :", Date , "Conteneur :" , "Marque"]
         values_gauche = [f.get('numero'), f.get('date', '')[:10], f.get('dossier_no'), f.get('navire'), f.get('date_arrivee'), f.get('conteneur'), f.get('marque')]
         
         for i, (label, val) in enumerate(zip(labels_gauche, values_gauche)):
